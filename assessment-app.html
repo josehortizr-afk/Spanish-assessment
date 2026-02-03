@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Assessment de Vocabulario (100)</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --card: #ffffff;
+      --border: #e5e7eb;
+      --text: #111827;
+      --muted: #6b7280;
+      --primary: #2563eb;
+      --ok: #16a34a;
+      --bad: #dc2626;
+      --warn: #b45309;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      background: var(--bg);
+      color: var(--text);
+      padding: 24px 14px 80px;
+    }
+    .container { max-width: 980px; margin: 0 auto; }
+    header {
+      display: flex; align-items: flex-start; justify-content: space-between; gap: 14px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+    }
+    h1 { margin: 0; font-size: 18px; }
+    .sub { margin-top: 6px; color: var(--muted); font-size: 13px; }
+    .pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 8px 10px; border-radius: 999px;
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    .grid { 
+      display: flex; 
+      justify-content: center; 
+      margin-top: 14px; 
+    }
+    .grid > .card {
+      max-width: 800px;
+      width: 100%;
+    }
+    @media (max-width: 900px) { 
+      .grid > .card { 
+        max-width: 100%; 
+      } 
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 40px;
+    }
+    .btn {
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 14px;
+    }
+    .btn.primary {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+    .btn.primary:hover { opacity: .92; }
+    .btn:disabled { opacity: .55; cursor: not-allowed; }
+    .bar { height: 10px; border-radius: 999px; background: #e5e7eb; overflow: hidden; }
+    .bar > div { height: 100%; width: 0%; background: var(--primary); }
+    .kpis { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+    .kpis .pill strong { color: var(--text); }
+    .quiz, .results { display: none; margin-top: 14px; }
+    .qhead { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    .qtitle { margin: 0; font-size: 14px; font-weight: 900; }
+    .prompt { margin: 12px 0 10px; font-size: 28px; font-weight: 900; letter-spacing: .2px; }
+    .meta { color: var(--muted); font-size: 12px; }
+    .opts { display: grid; gap: 10px; margin-top: 10px; }
+    .opt {
+      width: 100%;
+      text-align: left;
+      padding: 14px;
+      border-radius: 12px;
+      border: 2px solid var(--border);
+      background: #fff;
+      color: var(--text);
+      cursor: pointer;
+      font-weight: 800;
+      transition: transform .08s, border-color .15s;
+    }
+    .opt:hover { transform: translateY(-1px); border-color: var(--primary); }
+    .opt.correct { border-color: var(--ok); background: rgba(22,163,74,.08); }
+    .opt.wrong { border-color: var(--bad); background: rgba(220,38,38,.08); }
+    .row { display: flex; justify-content: space-between; gap: 10px; align-items: center; margin-top: 12px; flex-wrap: wrap; }
+    .small { font-size: 12px; color: var(--muted); }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 10px 8px; border-bottom: 1px solid var(--border); text-align: left; font-size: 13px; }
+    th { color: var(--muted); font-size: 12px; font-weight: 800; }
+    .tag-ok { color: var(--ok); font-weight: 900; }
+    .tag-warn { color: var(--warn); font-weight: 900; }
+    .tag-bad { color: var(--bad); font-weight: 900; }
+    .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media (max-width: 900px) { .cols { grid-template-columns: 1fr; } }
+  
+    /* --- Home page (screenshot-style) --- */
+    body { background: #f8fafc; }
+    .grid { gap: 18px; margin-top: 18px; }
+    .card { box-shadow: 0 8px 28px rgba(15,23,42,.06); border-radius: 18px; }
+    header { border-radius: 18px; }
+    .meta.center { text-align: center; }
+
+    .heroTop { display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; }
+    .badge {
+      display:inline-flex;
+      align-items:center;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background:#eff6ff;
+      color:#1d4ed8;
+      font-weight: 900;
+      font-size: 12px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .heroTitle {
+      margin-top: 14px;
+      font-size: 34px;
+      font-weight: 950;
+      line-height: 1.05;
+      color: #0f172a;
+    }
+    .heroSub {
+      margin-top: 12px;
+      font-size: 16px;
+      color: #475569;
+      line-height: 1.55;
+      max-width: 760px;
+    }
+    .divider { height: 1px; background: #e5e7eb; margin: 18px 0; }
+
+    .steps { display:grid; gap: 14px; }
+    .step { display:flex; gap: 14px; align-items:flex-start; }
+    .stepNum {
+      width: 38px; height: 38px;
+      border-radius: 999px;
+      background:#2563eb;
+      color:#fff;
+      display:flex; align-items:center; justify-content:center;
+      font-weight: 950;
+      flex: 0 0 auto;
+    }
+    .stepTitle { font-size: 18px; font-weight: 950; color:#0f172a; }
+    .stepSub { margin-top: 3px; color:#64748b; font-size: 14px; line-height: 1.45; }
+
+    .tipBox {
+      margin-top: 18px;
+      display:flex;
+      gap: 10px;
+      align-items:flex-start;
+      padding: 14px 14px;
+      border-radius: 14px;
+      background:#eff6ff;
+      border: 1px solid #bfdbfe;
+      color:#1e3a8a;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+    .tipIcon { width: 26px; height: 26px; display:flex; align-items:center; justify-content:center; }
+
+    .metricGrid { display:grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; }
+    .metric { background:#ffffff; border: 1px solid #e5e7eb; border-radius: 16px; padding: 16px; text-align:center; }
+    .metricLabel { color:#64748b; font-size: 14px; font-weight: 800; }
+    .metricValue { margin-top: 8px; font-size: 34px; font-weight: 950; color:#2563eb; }
+    .metricMuted { color:#64748b; font-weight: 900; font-size: 26px; margin-left: 6px; }
+
+    .bar { background:#e5e7eb; height: 12px; border-radius: 999px; }
+    .bar > div { background: linear-gradient(90deg,#2563eb,#60a5fa); }
+
+    .goal { margin-top: 14px; color:#64748b; font-size: 14px; line-height: 1.5; }
+
+    .kpiChips { display:flex; gap: 10px; flex-wrap:wrap; margin-top: 14px; }
+    .chip {
+      background:#ffffff;
+      border:1px solid #e5e7eb;
+      border-radius: 999px;
+      padding: 10px 12px;
+      color:#334155;
+      font-size: 14px;
+      box-shadow: 0 8px 20px rgba(15,23,42,.04);
+    }
+    .chip .muted { color:#64748b; font-weight: 800; }
+
+    @media (max-width: 900px) {
+      .heroTitle { font-size: 28px; }
+      .metricValue { font-size: 30px; }
+    }
+
+  
+    /* --- Enforced typography --- */
+    body { font-size: 13px; }
+    h1, h2, h3, .heroTitle, .stepTitle, .metricLabel { font-size: 15px !important; }
+    .heroSub, .stepSub, .metricValue, .chip, .meta, .badge { font-size: 13px !important; }
+    /* Keep numbers readable without becoming huge */
+    .metricMuted { font-size: 13px !important; }
+
+  
+    /* --- Bottom progress dock --- */
+    .progressDock{
+      position:fixed; left:0; right:0; bottom:0;
+      background: rgba(248,250,252,.95);
+      backdrop-filter: blur(8px);
+      border-top:1px solid #e5e7eb;
+      padding: 10px 14px;
+      z-index: 60;
+    }
+    .progressDockInner{max-width:980px;margin:0 auto;display:grid;gap:8px}
+    .dockTop{
+      display:flex; gap:14px; flex-wrap:wrap;
+      align-items:center; justify-content:space-between;
+      font-size:13px; color:#0f172a;
+    }
+    .dockStat{display:flex;gap:6px;align-items:baseline;white-space:nowrap}
+    .dockStat strong{font-weight:950}
+    .dockStat .muted{color:#64748b;font-weight:700}
+    .dockBar{
+      height:8px; background:#e5e7eb; border-radius:999px; overflow:hidden;
+    }
+    .dockBar > div{
+      height:100%; width:0%;
+      background: linear-gradient(90deg,#2563eb,#60a5fa);
+    }
+    body{ padding-bottom: 84px; }
+
+    /* Print styles */
+    @media print {
+      @page {
+        margin: 1cm;
+      }
+      
+      body {
+        background: white;
+        padding: 0;
+      }
+      
+      header {
+        border-bottom: 2px solid #2563eb;
+        margin-bottom: 20px;
+      }
+      
+      .progressDock {
+        display: none !important;
+      }
+      
+      header .pill {
+        display: none !important;
+      }
+      
+      .btn {
+        display: none !important;
+      }
+      
+      .card {
+        page-break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #e5e7eb;
+        margin-bottom: 15px;
+      }
+      
+      .grid {
+        display: block;
+      }
+      
+      table {
+        page-break-inside: avoid;
+      }
+      
+      h1, h2, h3 {
+        color: #0f172a;
+      }
+    }
+
+</style>
+</head>
+<body>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <div class="container">
+    <header>
+      <div>
+        <h1>Vocabulary Assessment (100 Questions)</h1>
+      </div>
+      <div class="pill" id="status">Listo ✅</div>
+    </header>
+
+    
+    <div class="grid">
+      <!-- Left: Hero + steps + tip -->
+      <div class="card">
+        <div class="heroTop" style="flex-direction: column; align-items: center; text-align: center; gap: 20px;">
+          <div class="badge">QUICK DIAGNOSTIC • 100 QUESTIONS</div>
+          <div class="heroTitle" style="margin-top: 0;">Find exactly what vocabulary to review next.</div>
+          <div class="heroSub" style="margin-top: 0; max-width: 600px;">
+            Each question shows a <strong>Spanish</strong> word — you pick the correct <strong>English</strong> meaning.
+          </div>
+          <button class="btn primary" id="startBtn" style="margin-top: 10px;">Start assessment</button>
+        </div>
+
+        
+
+        <div class="tipBox" style="margin-top: 30px;">
+          <div class="tipIcon">💡</div>
+          <div>
+            <strong>Tip:</strong> If you miss a word, it will appear in your <strong>Study List</strong> at the end, so you know exactly what to review.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card quiz" id="quiz">
+      <div class="qhead">
+        <div>
+          <p class="qtitle" id="qTitle">Pregunta</p>
+          <div class="meta" id="qMeta"></div>
+        </div>
+        <button class="btn" id="quitBtn">Salir</button>
+      </div>
+
+      <div class="prompt" id="prompt">—</div>
+      <div class="opts" id="opts"></div>
+
+      <div class="row">
+        <div class="small" id="feedback"></div>
+        <button class="btn primary" id="nextBtn" disabled>Siguiente →</button>
+      </div>
+    </div>
+
+    <div class="card results" id="results">
+      <div class="cols">
+        <div class="card">
+          <div class="meta">Resultado total</div>
+          <div style="font-size:40px;font-weight:950;margin-top:4px" id="finalPct">0%</div>
+          <div class="small" id="finalSummary"></div>
+          <div class="row" style="margin-top:10px">
+            <button class="btn" id="restartBtn">Reiniciar</button>
+            <button class="btn" id="weakBtn">Practicar débiles</button>
+            <button class="btn primary" id="printBtn">📄 Guardar como PDF</button>
+            <button class="btn" id="downloadBtn">💾 Descargar JSON</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="meta">Recomendación</div>
+          <div id="recommendation" style="margin-top:10px"></div>
+          <div class="small" style="margin-top:10px">Regla: <strong>&lt;80%</strong> reforzar • <strong>&lt;60%</strong> prioridad alta.</div>
+        </div>
+      </div>
+
+      <div style="margin-top:14px">
+        <div class="meta">Rendimiento por categoría</div>
+        <table style="margin-top:10px">
+          <thead><tr><th>Categoría</th><th>Correctas</th><th>Total</th><th>Precisión</th><th>Acción</th></tr></thead>
+          <tbody id="catBody"></tbody>
+        </table>
+      </div>
+
+      <div style="margin-top:14px">
+        <div class="meta">Vocabulario para estudiar (lo que fallaste)</div>
+        <div id="studyList" style="margin-top:10px"></div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const DATA = {"bank_vocab": [{"category": "Saludos", "es": "hola", "en": "hello"}, {"category": "Saludos", "es": "buenos días", "en": "good morning"}, {"category": "Saludos", "es": "buenas tardes", "en": "good afternoon"}, {"category": "Saludos", "es": "buenas noches", "en": "good evening/night"}, {"category": "Saludos", "es": "¿cómo estás?", "en": "how are you? (informal)"}, {"category": "Saludos", "es": "¿cómo está?", "en": "how are you? (formal)"}, {"category": "Saludos", "es": "¿qué tal?", "en": "how's it going?"}, {"category": "Saludos", "es": "bien", "en": "well/good"}, {"category": "Saludos", "es": "muy bien", "en": "very well"}, {"category": "Saludos", "es": "mal", "en": "bad"}, {"category": "Saludos", "es": "así así", "en": "so-so"}, {"category": "Saludos", "es": "gracias", "en": "thank you"}, {"category": "Saludos", "es": "muchas gracias", "en": "thank you very much"}, {"category": "Saludos", "es": "de nada", "en": "you're welcome"}, {"category": "Saludos", "es": "por favor", "en": "please"}, {"category": "Saludos", "es": "perdón", "en": "sorry/excuse me"}, {"category": "Saludos", "es": "disculpa", "en": "excuse me (informal)"}, {"category": "Saludos", "es": "lo siento", "en": "I'm sorry"}, {"category": "Saludos", "es": "adiós", "en": "goodbye"}, {"category": "Saludos", "es": "hasta luego", "en": "see you later"}, {"category": "Saludos", "es": "hasta mañana", "en": "see you tomorrow"}, {"category": "Saludos", "es": "hasta pronto", "en": "see you soon"}, {"category": "Saludos", "es": "nos vemos", "en": "see you"}, {"category": "Saludos", "es": "chao", "en": "bye"}, {"category": "Saludos", "es": "buena suerte", "en": "good luck"}, {"category": "Saludos", "es": "bienvenido/a", "en": "welcome"}, {"category": "Saludos", "es": "mucho gusto", "en": "nice to meet you"}, {"category": "Saludos", "es": "encantado/a", "en": "pleased to meet you"}, {"category": "Cara y Cabeza", "es": "la cabeza", "en": "head"}, {"category": "Cara y Cabeza", "es": "el cabello", "en": "hair"}, {"category": "Cara y Cabeza", "es": "la frente", "en": "forehead"}, {"category": "Cara y Cabeza", "es": "las cejas", "en": "eyebrows"}, {"category": "Cara y Cabeza", "es": "los ojos", "en": "eyes"}, {"category": "Cara y Cabeza", "es": "las pestañas", "en": "eyelashes"}, {"category": "Cara y Cabeza", "es": "los párpados", "en": "eyelids"}, {"category": "Cara y Cabeza", "es": "las mejillas", "en": "cheeks"}, {"category": "Cara y Cabeza", "es": "la nariz", "en": "nose"}, {"category": "Cara y Cabeza", "es": "la boca", "en": "mouth"}, {"category": "Cara y Cabeza", "es": "los labios", "en": "lips"}, {"category": "Cara y Cabeza", "es": "los dientes", "en": "teeth"}, {"category": "Cara y Cabeza", "es": "la lengua", "en": "tongue"}, {"category": "Cara y Cabeza", "es": "la barbilla", "en": "chin"}, {"category": "Cara y Cabeza", "es": "las orejas", "en": "ears"}, {"category": "Cara y Cabeza", "es": "la cara", "en": "face"}, {"category": "Cara y Cabeza", "es": "la mandíbula", "en": "jaw"}, {"category": "Partes del Cuerpo", "es": "el cuello", "en": "neck"}, {"category": "Partes del Cuerpo", "es": "la garganta", "en": "throat"}, {"category": "Partes del Cuerpo", "es": "los hombros", "en": "shoulders"}, {"category": "Partes del Cuerpo", "es": "el pecho", "en": "chest"}, {"category": "Partes del Cuerpo", "es": "la espalda", "en": "back"}, {"category": "Partes del Cuerpo", "es": "el estómago", "en": "stomach"}, {"category": "Partes del Cuerpo", "es": "la cintura", "en": "waist"}, {"category": "Partes del Cuerpo", "es": "las caderas", "en": "hips"}, {"category": "Partes del Cuerpo", "es": "los brazos", "en": "arms"}, {"category": "Partes del Cuerpo", "es": "el codo", "en": "elbow"}, {"category": "Partes del Cuerpo", "es": "el antebrazo", "en": "forearm"}, {"category": "Partes del Cuerpo", "es": "la muñeca", "en": "wrist"}, {"category": "Partes del Cuerpo", "es": "las manos", "en": "hands"}, {"category": "Partes del Cuerpo", "es": "la palma", "en": "palm"}, {"category": "Partes del Cuerpo", "es": "los dedos de las manos", "en": "fingers"}, {"category": "Partes del Cuerpo", "es": "las uñas", "en": "nails"}, {"category": "Partes del Cuerpo", "es": "el pulgar", "en": "thumb"}, {"category": "Partes del Cuerpo", "es": "las piernas", "en": "legs"}, {"category": "Partes del Cuerpo", "es": "el muslo", "en": "thigh"}, {"category": "Partes del Cuerpo", "es": "la rodilla", "en": "knee"}, {"category": "Partes del Cuerpo", "es": "la pantorrilla", "en": "calf"}, {"category": "Partes del Cuerpo", "es": "el tobillo", "en": "ankle"}, {"category": "Partes del Cuerpo", "es": "los pies", "en": "feet"}, {"category": "Partes del Cuerpo", "es": "el talón", "en": "heel"}, {"category": "Partes del Cuerpo", "es": "los dedos de los pies", "en": "toes"}, {"category": "Ropa", "es": "la camisa", "en": "shirt"}, {"category": "Ropa", "es": "la camiseta", "en": "T-shirt"}, {"category": "Ropa", "es": "la chaqueta", "en": "jacket"}, {"category": "Ropa", "es": "el abrigo", "en": "coat"}, {"category": "Ropa", "es": "el vestido", "en": "dress"}, {"category": "Ropa", "es": "la falda", "en": "skirt"}, {"category": "Ropa", "es": "los pantalones", "en": "pants"}, {"category": "Ropa", "es": "los jeans", "en": "jeans"}, {"category": "Ropa", "es": "los zapatos", "en": "shoes"}, {"category": "Ropa", "es": "los calcetines", "en": "socks"}, {"category": "Ropa", "es": "el cinturón", "en": "belt"}, {"category": "Colores", "es": "rojo/a", "en": "red"}, {"category": "Colores", "es": "azul", "en": "blue"}, {"category": "Colores", "es": "amarillo/a", "en": "yellow"}, {"category": "Colores", "es": "verde", "en": "green"}, {"category": "Colores", "es": "negro/a", "en": "black"}, {"category": "Colores", "es": "blanco/a", "en": "white"}, {"category": "Colores", "es": "gris", "en": "gray"}, {"category": "Colores", "es": "marrón", "en": "brown"}, {"category": "Colores", "es": "naranja", "en": "orange"}, {"category": "Colores", "es": "rosa", "en": "pink"}, {"category": "Colores", "es": "morado/a", "en": "purple"}, {"category": "Familia", "es": "la familia", "en": "family"}, {"category": "Familia", "es": "el padre", "en": "father"}, {"category": "Familia", "es": "la madre", "en": "mother"}, {"category": "Familia", "es": "el hermano", "en": "brother"}, {"category": "Familia", "es": "la hermana", "en": "sister"}, {"category": "Familia", "es": "el hijo", "en": "son"}, {"category": "Familia", "es": "la hija", "en": "daughter"}, {"category": "Familia", "es": "el abuelo", "en": "grandfather"}, {"category": "Familia", "es": "la abuela", "en": "grandmother"}, {"category": "Familia", "es": "el tío", "en": "uncle"}, {"category": "Familia", "es": "la tía", "en": "aunt"}, {"category": "Familia", "es": "el primo", "en": "cousin (male)"}, {"category": "Familia", "es": "la prima", "en": "cousin (female)"}, {"category": "Familia", "es": "el esposo", "en": "husband"}, {"category": "Familia", "es": "la esposa", "en": "wife"}, {"category": "Palabras Comunes", "es": "el agua", "en": "water"}, {"category": "Palabras Comunes", "es": "la comida", "en": "food"}, {"category": "Palabras Comunes", "es": "el pan", "en": "bread"}, {"category": "Palabras Comunes", "es": "la leche", "en": "milk"}, {"category": "Palabras Comunes", "es": "el café", "en": "coffee"}, {"category": "Palabras Comunes", "es": "el té", "en": "tea"}, {"category": "Palabras Comunes", "es": "el día", "en": "day"}, {"category": "Palabras Comunes", "es": "la noche", "en": "night"}, {"category": "Palabras Comunes", "es": "el año", "en": "year"}, {"category": "Palabras Comunes", "es": "el mes", "en": "month"}, {"category": "Palabras Comunes", "es": "la semana", "en": "week"}, {"category": "Palabras Comunes", "es": "el tiempo", "en": "time/weather"}, {"category": "Palabras Comunes", "es": "la casa", "en": "house"}, {"category": "Palabras Comunes", "es": "la puerta", "en": "door"}, {"category": "Palabras Comunes", "es": "la ventana", "en": "window"}, {"category": "Palabras Comunes", "es": "el libro", "en": "book"}, {"category": "Palabras Comunes", "es": "la mesa", "en": "table"}, {"category": "Palabras Comunes", "es": "la silla", "en": "chair"}, {"category": "Palabras Comunes", "es": "el trabajo", "en": "work/job"}, {"category": "Palabras Comunes", "es": "la escuela", "en": "school"}, {"category": "Escuela", "es": "el profesor / la profesora", "en": "teacher"}, {"category": "Escuela", "es": "el estudiante / la estudiante", "en": "student"}, {"category": "Escuela", "es": "el aula", "en": "classroom"}, {"category": "Escuela", "es": "el escritorio", "en": "desk"}, {"category": "Escuela", "es": "el cuaderno", "en": "notebook"}, {"category": "Escuela", "es": "el bolígrafo", "en": "pen"}, {"category": "Escuela", "es": "el lápiz", "en": "pencil"}, {"category": "Escuela", "es": "la goma de borrar", "en": "eraser"}, {"category": "Escuela", "es": "la mochila", "en": "backpack"}, {"category": "Comida y Bebida", "es": "el arroz", "en": "rice"}, {"category": "Comida y Bebida", "es": "la manzana", "en": "apple"}, {"category": "Comida y Bebida", "es": "el plátano", "en": "banana"}, {"category": "Comida y Bebida", "es": "el huevo", "en": "egg"}, {"category": "Comida y Bebida", "es": "el pollo", "en": "chicken"}, {"category": "Comida y Bebida", "es": "el pescado", "en": "fish"}, {"category": "Comida y Bebida", "es": "la carne", "en": "meat"}, {"category": "Comida y Bebida", "es": "las verduras", "en": "vegetables"}, {"category": "Comida y Bebida", "es": "el jugo", "en": "juice"}, {"category": "Comida y Bebida", "es": "el helado", "en": "ice cream"}, {"category": "Comida y Bebida", "es": "el pastel", "en": "cake"}, {"category": "Clima", "es": "el sol", "en": "sun"}, {"category": "Clima", "es": "la lluvia", "en": "rain"}, {"category": "Clima", "es": "la nieve", "en": "snow"}, {"category": "Clima", "es": "el viento", "en": "wind"}, {"category": "Clima", "es": "la nube", "en": "cloud"}, {"category": "Clima", "es": "caliente", "en": "hot"}, {"category": "Clima", "es": "frío", "en": "cold"}, {"category": "Clima", "es": "soleado", "en": "sunny"}, {"category": "Clima", "es": "lluvioso", "en": "rainy"}, {"category": "Clima", "es": "nublado", "en": "cloudy"}, {"category": "Casa", "es": "el cuarto / la habitación", "en": "room/bedroom"}, {"category": "Casa", "es": "el baño", "en": "bathroom"}, {"category": "Casa", "es": "la cocina", "en": "kitchen"}, {"category": "Casa", "es": "la sala", "en": "living room"}, {"category": "Casa", "es": "el comedor", "en": "dining room"}, {"category": "Casa", "es": "el patio", "en": "patio/backyard"}, {"category": "Casa", "es": "la cama", "en": "bed"}, {"category": "Casa", "es": "el refrigerador", "en": "refrigerator"}, {"category": "Casa", "es": "la ducha", "en": "shower"}, {"category": "Casa", "es": "el piso", "en": "floor"}, {"category": "Casa", "es": "las escaleras", "en": "stairs"}, {"category": "Animales", "es": "el perro", "en": "dog"}, {"category": "Animales", "es": "el gato", "en": "cat"}, {"category": "Animales", "es": "el pájaro", "en": "bird"}, {"category": "Animales", "es": "el pez", "en": "fish"}, {"category": "Animales", "es": "el caballo", "en": "horse"}, {"category": "Animales", "es": "la vaca", "en": "cow"}, {"category": "Animales", "es": "el cerdo", "en": "pig"}, {"category": "Animales", "es": "la oveja", "en": "sheep"}, {"category": "Animales", "es": "el conejo", "en": "rabbit"}, {"category": "Animales", "es": "el ratón", "en": "mouse"}, {"category": "Animales", "es": "el león", "en": "lion"}, {"category": "Animales", "es": "el tigre", "en": "tiger"}, {"category": "Animales", "es": "el elefante", "en": "elephant"}, {"category": "Animales", "es": "la jirafa", "en": "giraffe"}, {"category": "Animales", "es": "el mono", "en": "monkey"}, {"category": "Animales", "es": "el oso", "en": "bear"}, {"category": "Animales", "es": "el lobo", "en": "wolf"}, {"category": "Animales", "es": "la serpiente", "en": "snake"}, {"category": "Animales", "es": "la rana", "en": "frog"}, {"category": "Animales", "es": "la tortuga", "en": "turtle"}, {"category": "Adjetivos", "es": "largo/a", "en": "long"}, {"category": "Adjetivos", "es": "corto/a", "en": "short"}, {"category": "Adjetivos", "es": "grande", "en": "big"}, {"category": "Adjetivos", "es": "pequeño/a", "en": "small"}, {"category": "Adjetivos", "es": "nuevo/a", "en": "new"}, {"category": "Adjetivos", "es": "viejo/a", "en": "old"}, {"category": "Adjetivos", "es": "joven", "en": "young"}, {"category": "Adjetivos", "es": "bueno/a", "en": "good"}, {"category": "Adjetivos", "es": "malo/a", "en": "bad"}, {"category": "Adjetivos", "es": "limpio/a", "en": "clean"}, {"category": "Adjetivos", "es": "sucio/a", "en": "dirty"}, {"category": "Adjetivos", "es": "fuerte", "en": "strong"}, {"category": "Adjetivos", "es": "fácil", "en": "easy"}, {"category": "Adjetivos", "es": "difícil", "en": "difficult"}, {"category": "Adjetivos", "es": "bonito/a", "en": "pretty/beautiful"}, {"category": "Adjetivos", "es": "feo/a", "en": "ugly"}, {"category": "Adjetivos", "es": "feliz", "en": "happy"}, {"category": "Adjetivos", "es": "triste", "en": "sad"}, {"category": "Adjetivos", "es": "cansado/a", "en": "tired"}, {"category": "Adjetivos", "es": "contento/a", "en": "content/happy"}], "bank_numbers": [{"category": "Números", "es": "cero", "en": "zero"}, {"category": "Números", "es": "uno", "en": "one"}, {"category": "Números", "es": "dos", "en": "two"}, {"category": "Números", "es": "tres", "en": "three"}, {"category": "Números", "es": "cuatro", "en": "four"}, {"category": "Números", "es": "cinco", "en": "five"}, {"category": "Números", "es": "seis", "en": "six"}, {"category": "Números", "es": "siete", "en": "seven"}, {"category": "Números", "es": "ocho", "en": "eight"}, {"category": "Números", "es": "nueve", "en": "nine"}, {"category": "Números", "es": "diez", "en": "ten"}, {"category": "Números", "es": "once", "en": "eleven"}, {"category": "Números", "es": "doce", "en": "twelve"}, {"category": "Números", "es": "trece", "en": "thirteen"}, {"category": "Números", "es": "catorce", "en": "fourteen"}, {"category": "Números", "es": "quince", "en": "fifteen"}, {"category": "Números", "es": "veinte", "en": "twenty"}, {"category": "Números", "es": "treinta", "en": "thirty"}, {"category": "Números", "es": "cuarenta", "en": "forty"}, {"category": "Números", "es": "cincuenta", "en": "fifty"}]};
+
+  const shuffle = (arr) => {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  };
+
+  const $ = (s) => document.querySelector(s);
+
+  const STATE = {
+    questions: [],
+    i: 0,
+    correct: 0,
+    streak: 0,
+    answered: false,
+    byCat: {}, // cat -> {ok,total}
+    missed: [],  // {category, es, en, chosen}
+  };
+
+  const TOTAL = 100;
+  const N_VOCAB = 80;
+  const N_NUM = 20;
+
+  function pickFixedQuestions() {
+    const vocab = shuffle(DATA.bank_vocab);
+    const nums  = shuffle(DATA.bank_numbers);
+
+    const vocabPick = [];
+    while (vocabPick.length < N_VOCAB) {
+      vocabPick.push(vocab[vocabPick.length % vocab.length]);
+    }
+
+    const numPick = [];
+    while (numPick.length < N_NUM) {
+      numPick.push(nums[numPick.length % nums.length]);
+    }
+
+    const qs = [
+      ...vocabPick.map(x => ({...x, type:"vocab"})),
+      ...numPick.map(x => ({...x, type:"num"}))
+    ];
+
+    return shuffle(qs).slice(0, TOTAL);
+  }
+
+  function updateKPIs() {
+    const qEl = document.getElementById("kpiQ");
+    if (qEl) qEl.textContent = String(STATE.i);
+
+    const okEl = document.getElementById("kpiOk");
+    if (okEl) okEl.textContent = String(STATE.correct);
+
+    const accEl = document.getElementById("kpiAcc");
+    if (accEl) accEl.textContent = (STATE.i ? Math.round((STATE.correct/STATE.i)*100) : 0) + "%";
+
+    const stEl = document.getElementById("kpiStreak");
+    if (stEl) stEl.textContent = String(STATE.streak);
+
+    const bar = document.getElementById("barFill");
+    if (bar) bar.style.width = Math.round((STATE.i / TOTAL) * 100) + "%";
+  }
+
+  function bumpCat(cat, ok) {
+    if (!STATE.byCat[cat]) STATE.byCat[cat] = {ok:0,total:0};
+    STATE.byCat[cat].total += 1;
+    if (ok) STATE.byCat[cat].ok += 1;
+  }
+
+  function makeOptions(q) {
+    const correct = q.en;
+    const basePool = q.type === "num" ? DATA.bank_numbers : DATA.bank_vocab;
+
+    const poolSame = basePool
+      .filter(x => x.en !== correct && x.category === q.category)
+      .map(x => x.en);
+
+    const poolAny = (DATA.bank_vocab.concat(DATA.bank_numbers))
+      .filter(x => x.en !== correct)
+      .map(x => x.en);
+
+    const distractors = [];
+    const seen = new Set([String(correct).trim().toLowerCase()]);
+
+    const takeFrom = (pool) => {
+      for (const v of shuffle(pool)) {
+        const k = String(v).trim().toLowerCase();
+        if (!k || seen.has(k)) continue;
+        seen.add(k);
+        distractors.push(v);
+        if (distractors.length >= 3) break;
+      }
+    };
+
+    takeFrom(poolSame);
+    if (distractors.length < 3) takeFrom(poolAny);
+
+    const opts = shuffle([correct, ...distractors]).slice(0, 4);
+    return {opts, correct};
+  }
+
+  function renderQuestion() {
+    const q = STATE.questions[STATE.i];
+    $("#qTitle").textContent = "Pregunta " + (STATE.i + 1) + " de " + TOTAL;
+    $("#qMeta").textContent = "Categoría: " + q.category + (q.type === "num" ? " • (Números)" : "");
+    $("#prompt").textContent = q.es;
+    $("#feedback").textContent = "";
+    $("#nextBtn").disabled = true;
+    STATE.answered = false;
+
+    const {opts, correct} = makeOptions(q);
+    q._opts = opts;
+    q._correct = correct;
+
+    const wrap = $("#opts");
+    wrap.innerHTML = "";
+    opts.forEach(opt => {
+      const b = document.createElement("button");
+      b.className = "opt";
+      b.textContent = opt;
+      b.onclick = () => selectOption(opt);
+      wrap.appendChild(b);
+    });
+  }
+
+  function selectOption(choice) {
+    if (STATE.answered) return;
+    const q = STATE.questions[STATE.i];
+    const ok = choice === q._correct;
+    STATE.answered = true;
+
+    [...$("#opts").children].forEach(el => {
+      const val = el.textContent;
+      if (val === q._correct) el.classList.add("correct");
+      if (val === choice && !ok) el.classList.add("wrong");
+      el.disabled = true;
+    });
+
+    bumpCat(q.category, ok);
+
+    if (ok) {
+      STATE.correct += 1;
+      STATE.streak += 1;
+      $("#feedback").textContent = "✅ Correcto";
+    } else {
+      STATE.streak = 0;
+      STATE.missed.push({category:q.category, es:q.es, en:q.en, chosen:choice});
+      $("#feedback").innerHTML = "❌ Incorrecto. Correcto: <strong>" + q._correct + "</strong>";
+    }
+
+    STATE.i += 1;
+    updateKPIs();
+    $("#nextBtn").disabled = false;
+  }
+
+  function finish() {
+    $("#quiz").style.display = "none";
+    $("#results").style.display = "block";
+    $("#status").textContent = "Terminado ✅";
+
+    const pct = Math.round((STATE.correct / TOTAL) * 100);
+    $("#finalPct").textContent = pct + "%";
+    $("#finalSummary").textContent = STATE.correct + " correctas de " + TOTAL + " preguntas.";
+
+    const cats = Object.keys(STATE.byCat).sort((a,b)=>a.localeCompare(b));
+    const reinforce = [];
+    const body = $("#catBody");
+    body.innerHTML = "";
+
+    cats.forEach(cat => {
+      const ok = STATE.byCat[cat].ok;
+      const t = STATE.byCat[cat].total;
+      const a = t ? Math.round((ok/t)*100) : 0;
+
+      let action = "Bien ✅";
+      let cls = "tag-ok";
+      if (a < 60) { action = "Prioridad alta"; cls = "tag-bad"; reinforce.push({cat,a,level:"alta"}); }
+      else if (a < 80) { action = "Reforzar"; cls = "tag-warn"; reinforce.push({cat,a,level:"media"}); }
+
+      const tr = document.createElement("tr");
+      tr.innerHTML =
+        "<td><strong>" + cat + "</strong></td>" +
+        "<td>" + ok + "</td>" +
+        "<td>" + t + "</td>" +
+        "<td>" + a + "%</td>" +
+        "<td class='" + cls + "'>" + action + "</td>";
+      body.appendChild(tr);
+    });
+
+    reinforce.sort((x,y)=>x.a - y.a);
+    const rec = $("#recommendation");
+    if (!reinforce.length) {
+      rec.innerHTML = "<div class='tag-ok'>Excelente. Sigue con repaso mixto 10–15 min/día.</div>";
+    } else {
+      const top = reinforce.slice(0,6).map(r => {
+        const icon = r.level === "alta" ? "🔴" : "🟠";
+        return "<div class='pill' style='margin:6px 0;justify-content:space-between;width:100%'>" +
+               "<span>" + icon + " <strong>" + r.cat + "</strong></span>" +
+               "<span class='small'>" + r.a + "%</span>" +
+               "</div>";
+      }).join("");
+      rec.innerHTML =
+        "<div class='small'>Enfócate primero en estas categorías:</div>" + top +
+        "<div class='small' style='margin-top:10px'>Rutina: estudia 8–12 palabras → repite solo esas categorías → vuelve mañana.</div>";
+    }
+
+    const by = {};
+    const seen = new Set();
+    STATE.missed.forEach(m => {
+      const k = (m.es||"").trim().toLowerCase();
+      if (!k || seen.has(k)) return;
+      seen.add(k);
+      if (!by[m.category]) by[m.category] = [];
+      by[m.category].push(m);
+    });
+
+    const wrap = $("#studyList");
+    if (!STATE.missed.length) {
+      wrap.innerHTML = "<div class='tag-ok'>🎯 No fallaste ninguna palabra.</div>";
+    } else {
+      const parts = Object.keys(by).sort((a,b)=>a.localeCompare(b)).map(cat => {
+        const items = by[cat].slice(0, 20).map(x =>
+          "<li style='margin:7px 0'><strong>" + x.es + "</strong> — <span class='small'>" + x.en + "</span></li>"
+        ).join("");
+        return "<div class='card' style='margin-top:10px'>" +
+               "<div style='font-weight:950;margin-bottom:6px'>📌 " + cat + " <span class='small'>(" + by[cat].length + ")</span></div>" +
+               "<ul style='margin:0 0 0 18px;padding:0'>" + items + "</ul>" +
+               "</div>";
+      });
+      wrap.innerHTML = parts.join("");
+    }
+
+    $("#downloadBtn").onclick = () => {
+      const report = {
+        createdAt: new Date().toISOString(),
+        total: TOTAL,
+        correct: STATE.correct,
+        accuracy: pct,
+        byCategory: STATE.byCat,
+        missed: STATE.missed
+      };
+      const blob = new Blob([JSON.stringify(report, null, 2)], {type:"application/json"});
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "reporte-assessment-100.json";
+      a.click();
+      URL.revokeObjectURL(a.href);
+    };
+
+    $("#printBtn").onclick = async () => {
+      try {
+        // Show loading message
+        const originalText = $("#printBtn").textContent;
+        $("#printBtn").textContent = "Generando PDF...";
+        $("#printBtn").disabled = true;
+        
+        // Hide buttons and dock temporarily
+        const buttons = document.querySelectorAll('.btn');
+        const dock = document.getElementById('progressDock');
+        const pill = document.querySelector('header .pill');
+        
+        buttons.forEach(btn => btn.style.visibility = 'hidden');
+        if (dock) dock.style.display = 'none';
+        if (pill) pill.style.display = 'none';
+        
+        // Wait a bit for DOM to update
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        // Capture the results section as image
+        const resultsElement = document.getElementById('results');
+        const canvas = await html2canvas(resultsElement, {
+          scale: 2,
+          useCORS: true,
+          logging: false,
+          backgroundColor: '#ffffff'
+        });
+        
+        // Create PDF
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF({
+          orientation: 'portrait',
+          unit: 'mm',
+          format: 'a4'
+        });
+        
+        // Add title
+        pdf.setFontSize(20);
+        pdf.setTextColor(37, 99, 235);
+        pdf.text('Vocabulary Assessment Results', 105, 15, { align: 'center' });
+        
+        // Add date
+        pdf.setFontSize(10);
+        pdf.setTextColor(100, 100, 100);
+        const dateStr = new Date().toLocaleDateString('es-ES', { 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric' 
+        });
+        pdf.text(dateStr, 105, 22, { align: 'center' });
+        
+        // Add the captured image
+        const imgData = canvas.toDataURL('image/png');
+        const imgWidth = 190; // A4 width minus margins
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        
+        let heightLeft = imgHeight;
+        let position = 30;
+        
+        pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+        heightLeft -= (297 - position); // A4 height
+        
+        // Add new pages if content is too long
+        while (heightLeft > 0) {
+          position = heightLeft - imgHeight + 30;
+          pdf.addPage();
+          pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+          heightLeft -= 297;
+        }
+        
+        // Save the PDF
+        const filename = `assessment-results-${new Date().toISOString().split('T')[0]}.pdf`;
+        pdf.save(filename);
+        
+        // Restore UI
+        buttons.forEach(btn => btn.style.visibility = '');
+        if (dock) dock.style.display = '';
+        if (pill) pill.style.display = '';
+        $("#printBtn").textContent = originalText;
+        $("#printBtn").disabled = false;
+        
+      } catch (error) {
+        console.error('Error generating PDF:', error);
+        alert('Error al generar el PDF. Por favor intenta de nuevo.');
+        
+        // Restore UI on error
+        const buttons = document.querySelectorAll('.btn');
+        buttons.forEach(btn => {
+          btn.style.visibility = '';
+          btn.disabled = false;
+        });
+        $("#printBtn").textContent = "📄 Guardar como PDF";
+      }
+    };
+
+    $("#weakBtn").onclick = () => {
+      const weak = new Set(reinforce.map(r => r.cat));
+      if (!weak.size) {
+        alert("No hay categorías débiles (<80%).");
+        return;
+      }
+      const vocabPool = DATA.bank_vocab.filter(x => weak.has(x.category));
+      const numPool = DATA.bank_numbers.filter(x => weak.has(x.category));
+      const vPick = shuffle(vocabPool);
+      const nPick = shuffle(numPool);
+
+      const qs = shuffle([
+        ...vPick.slice(0, Math.min(80, vPick.length)).map(x => ({...x, type:"vocab"})),
+        ...nPick.slice(0, Math.min(20, nPick.length)).map(x => ({...x, type:"num"}))
+      ]);
+
+      startWithQuestions(qs.length ? qs.slice(0, TOTAL) : pickFixedQuestions());
+    };
+  }
+
+  function startWithQuestions(qs) {
+    STATE.questions = qs;
+    STATE.i = 0;
+    STATE.correct = 0;
+    STATE.streak = 0;
+    STATE.answered = false;
+    STATE.byCat = {};
+    STATE.missed = [];
+    $("#results").style.display = "none";
+    $("#quiz").style.display = "block";
+    const dock = document.getElementById("progressDock"); if (dock) dock.style.display = "block";
+    $("#status").textContent = "En progreso…";
+    updateKPIs();
+    renderQuestion();
+  }
+
+  function start() {
+    startWithQuestions(pickFixedQuestions());
+  }
+
+  $("#startBtn").onclick = start;
+
+  $("#nextBtn").onclick = () => {
+    if (!STATE.answered) return;
+    if (STATE.i >= TOTAL) finish();
+    else renderQuestion();
+  };
+
+  $("#quitBtn").onclick = () => {
+    if (confirm("¿Salir? Se perderá el intento actual.")) {
+      $("#quiz").style.display = "none";
+      $("#results").style.display = "none";
+      const dock = document.getElementById("progressDock"); if (dock) dock.style.display = "none";
+      $("#status").textContent = "Listo ✅";
+      STATE.questions = [];
+      STATE.i = 0;
+      STATE.correct = 0;
+      STATE.streak = 0;
+      STATE.byCat = {};
+      STATE.missed = [];
+      updateKPIs();
+    }
+  };
+
+  $("#restartBtn").onclick = () => {
+    $("#results").style.display = "none";
+    $("#quiz").style.display = "none";
+    const dock = document.getElementById("progressDock"); if (dock) dock.style.display = "none";
+    $("#status").textContent = "Listo ✅";
+    STATE.questions = [];
+    STATE.i = 0;
+    STATE.correct = 0;
+    STATE.streak = 0;
+    STATE.byCat = {};
+    STATE.missed = [];
+    updateKPIs();
+  };
+
+  updateKPIs();
+</script>
+
+  <!-- Bottom progress dock (shows only during the quiz) -->
+  <div class="progressDock" id="progressDock" style="display:none">
+    <div class="progressDockInner">
+      <div class="dockTop">
+        <div class="dockStat"><strong id="kpiQ">0</strong><span class="muted">/100</span> <span class="muted">done</span></div>
+        <div class="dockStat"><strong id="kpiOk">0</strong> <span class="muted">correct</span></div>
+        <div class="dockStat"><strong id="kpiAcc">0%</strong> <span class="muted">accuracy</span></div>
+        <div class="dockStat"><strong id="kpiStreak">0</strong> <span class="muted">streak</span></div>
+      </div>
+      <div class="dockBar"><div id="barFill"></div></div>
+    </div>
+  </div>
+
+</body>
+</html>
